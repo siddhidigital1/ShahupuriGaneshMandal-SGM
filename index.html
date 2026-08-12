@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shahupuri Ganesh Mandal - Collection Portal</title>
+    <!-- Library to download the receipt box as an image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --primary: #10b981; --primary-dark: #059669; --bg: #f3f4f6; --card-bg: #ffffff; --text: #1f2937; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .main-wrapper { width: 100%; max-width: 550px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 50px; }
+        .container { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2, h3 { text-align: center; color: var(--primary-dark); margin-top: 0; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        
+        /* Main Action Buttons */
+        .primary-btn { width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+        .primary-btn:hover { background-color: var(--primary-dark); }
+        
+        /* Admin Navigation Button */
+        .admin-link-btn { width: 100%; background-color: #3b82f6; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 30px; display: block; text-align: center; text-decoration: none; box-sizing: border-box; }
+        .admin-link-btn:hover { background-color: #2563eb; }
+
+        /* --- STABLE LUXURY BANNER DESIGN --- */
+        .banner-receipt {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            background: #fffdf9;
+            color: #1f2937;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+            margin-top: 20px;
+            box-sizing: border-box;
+            border: 3px solid #b45309;
+        }
+        .banner-header-box {
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+            color: #fef08a;
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 2px solid #b45309;
+        }
+        .banner-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #fde047;
+            margin: 0;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            letter-spacing: 0.5px;
+        }
+        .banner-subtext {
+            font-size: 8px;
+            color: #fef3c7;
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+        .banner-body-flex {
+            display: flex;
+            align-items: stretch;
+        }
+        .banner-left-img {
+            width: 38%;
+            background: #2b0303;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            border-right: 2px solid #b45309;
+            overflow: hidden;
+            position: relative;
+        }
+        .banner-left-img img {
+            width: 100%;
+            height: 100%;
+            min-height: 270px;
+            object-fit: cover;
+            display: block;
+        }
+        .banner-right-content {
+            width: 62%;
+            background: #fffbeb;
+            padding: 10px 12px;
+            font-size: 11.5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .receipt-line-alt {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #d1d5db;
+            padding: 5px 0;
+            font-weight: 500;
+        }
+        .words-box-alt {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid #d97706;
+            padding: 6px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+            font-size: 10.5px;
+            color: #78350f;
+            font-weight: bold;
+        }
+        .banner-footer-box {
+            background: #450a0a;
+            color: #fde047;
+            text-align: center;
+            font-size: 10px;
+            padding: 6px;
+            border-top: 2px solid #b45309;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .download-img-btn { background-color: #d97706; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 12px; }
+        .whatsapp-btn { background-color: #25d366; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <div class="container">
+        <h2>🙏 Shahupuri Ganesh Mandal 🙏</h2>
+        <h3>Collection Portal</h3>
+        <div class="form-group"><label>Receipt Number (Auto)</label><input type="text" id="receiptNo" readonly style="background-color: #f9fafb; color: #6b7280;"></div>
+        <div class="form-group"><label>Donor Name (नाव)</label><input type="text" id="donorName" placeholder="Enter donor's full name"></div>
+        <div class="form-group"><label>WhatsApp Number (with country code)</label><input type="tel" id="mobile" placeholder="e.g., 919876543210" value="91"></div>
+        <div class="form-group"><label>Amount (रुपये)</label><input type="number" id="amount" placeholder="Enter amount"></div>
+        <div class="form-group"><label>Payment Mode</label><select id="paymentMode"><option value="Cash">Cash (रोख)</option><option value="Bank/UPI">Bank / UPI (ऑनलाइन)</option></select></div>
+        <div class="form-group"><label>Collector Name</label><input type="text" id="collector" placeholder="Volunteer name"></div>
+        <button class="primary-btn" onclick="generateReceipt()">Generate Banner Receipt</button>
+        
+        <!-- BANNER RECEIPT PREVIEW -->
+        <div class="banner-receipt" id="receiptCard">
+            <div class="banner-header-box">
+                <div style="font-size: 9px; letter-spacing: 1px; color: #fef08a; margin-bottom: 2px;">॥ श्री गणेशाय नमः ॥</div>
+                <div class="banner-title">शाहूपुरी गणेश मंडळ</div>
+                <div class="banner-subtext">६०४ इ वार्ड, शाहूपुरी पहिली गल्ली, कोल्हापूर - ४१६००१ • रजि. नं. : एफ १००२६</div>
+            </div>
+
+            <div class="banner-body-flex">
+                <div class="banner-left-img">
+                    <img src="logo.png" crossorigin="anonymous" alt="Ganesha">
+                </div>
+                <div class="banner-right-content">
+                    <div>
+                        <div style="font-size: 9.5px; text-align: center; color: #991b1b; font-weight: bold; margin-bottom: 4px;">✦ वर्गणी पावती (२०२६) ✦</div>
+                        
+                        <div class="receipt-line-alt"><span>पावती क्र.:</span> <strong id="pReceiptNo"></strong></div>
+                        <div class="receipt-line-alt"><span>दिनांक:</span> <strong id="pDate"></strong></div>
+                        <div class="receipt-line-alt"><span>श्री/सौ:</span> <strong id="pName"></strong></div>
+                        <div class="receipt-line-alt"><span>रक्कम:</span> <strong id="pAmount" style="color: #059669; font-size: 12.5px;"></strong></div>
+                        <div class="receipt-line-alt"><span>प्रकार:</span> <strong id="pMode"></strong></div>
+                        <div class="receipt-line-alt" style="border:none;"><span>संकलन:</span> <strong id="pCollector"></strong></div>
+                    </div>
+
+                    <div class="words-box-alt">
+                        <strong>अक्षरी रुपये:</strong> <span id="pAmountWords">रुपये मात्र</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="banner-footer-box">
+                आपल्या अमूल्य सहकार्याबद्दल धन्यवाद! 🌸 गणपती बाप्पा मोरया!
+            </div>
+        </div>
+
+        <!-- Action Buttons After Generation (Ensured visible and clickable) -->
+        <div id="actionButtons" style="display: none; margin-top: 15px;">
+            <button class="download-img-btn" onclick="downloadBannerImage()">📥 1. Download Banner as Image</button>
+            <button class="whatsapp-btn" onclick="sendWhatsAppText()">💬 2. Send Details via WhatsApp</button>
+        </div>
+
+        <!-- ADMIN BUTTON -->
+        <a href="admin.html" class="admin-link-btn">🏛️ Open Leader Dashboard (Admin)</a>
+    </div>
+</div>
+
+<script>
+    let currentData = {};
+    let transactions = JSON.parse(localStorage.getItem('mandal_transactions')) || [];
+    let receiptSeq = localStorage.getItem('mandal_last_receipt') ? parseInt(localStorage.getItem('mandal_last_receipt')) + 1 : 1;
+    document.getElementById('receiptNo').value = "SGM-2026-" + String(receiptSeq).padStart(3, '0');
+    
+    function numberToMarathiWords(num) {
+        if (isNaN(num) || num <= 0) return "शून्य रुपये मात्र";
+        
+        const ones = ['', 'एक', 'दोन', 'तीन', 'चार', 'पाच', 'सहा', 'सात', 'आठ', 'नऊ', 'दहा', 'अकरा', 'बारा', 'तेरा', 'चौदा', 'पंधरा', 'सोळा', 'सतरा', 'अठरा', 'एकोणिस', 'वीस', 'एकवीस', 'बावीस', 'तेवीस', 'चोवीस', 'पंचवीस', 'सव्वीस', 'सत्तावीस', 'अठ्ठावीस', 'एकूणतीस', 'तीस', 'एकतीस', 'बत्तीस', 'तेहेतीस', 'चौतीस', 'पस्तीस', 'छत्तीस', 'सततीस', 'अडतीस', 'एकूणचाळीस', 'चाळीस', 'एक्केचाळीस', 'बेचाळीस', 'त्र्याऐंशी', 'चव्वेचाळीस', 'पंचेचाळीस', 'शह्याचाळीस', 'सॉचाळीस', 'अडचाळीस', 'एकूणपन्नास', 'पन्नास', 'एकपन्नास', 'बापन्नास', 'त्रेपन्नास', 'चौपन्नास', 'पंचावन्न', 'छप्पन्न', 'सत्तावन्न', 'अठ्ठावन्न', 'एकूणसाठ', 'साठ', 'एकसष्ठ', 'बासष्ठ', 'त्रेसष्ठ', 'चौसष्ठ', 'पासष्ठ', 'सवसष्ठ', 'सस्रसष्ठ', 'अडसष्ठ', 'एकूणसत्तर', 'सत्तर', 'एकसत्तरी', 'बासत्तरी', 'त्रेसत्तरी', 'चौसत्तरी', 'पंचसत्तरी', 'सवसत्तरी', 'सस्रसत्तरी', 'अडसत्तरी', 'एकूणशी', 'अशी', 'एक्याऐंशी', 'ब्याऐंशी', 'त्र्याऐंशी', 'चौऱ्याऐंशी', 'पंचाऐंशी', 'सहाऐंशी', 'सत्ताऐंशी', 'अष्टाऐंशी', 'एकूणनव्वद', 'नव्वद', 'एक्याण्णव', 'ब्याण्णव', 'त्र्याण्णव', 'चौऱ्याण्णव', 'पंचाण्णव', 'शाह्याण्णव', 'सत्ताण्णव', 'अष्टाण्णव', 'नव्याण्णव'];
+        
+        let words = "";
+        
+        if (num >= 10000000) {
+            let crore = Math.floor(num / 10000000);
+            words += numberToMarathiWords(crore) + " कोटी ";
+            num %= 10000000;
+        }
+        if (num >= 100000) {
+            let lakh = Math.floor(num / 100000);
+            words += numberToMarathiWords(lakh) + " लाख ";
+            num %= 100000;
+        }
+        if (num >= 1000) {
+            let thousand = Math.floor(num / 1000);
+            words += numberToMarathiWords(thousand) + " हजार ";
+            num %= 1000;
+        }
+        if (num >= 100) {
+            let hundred = Math.floor(num / 100);
+            words += (hundred === 1 ? "एक" : ones[hundred]) + " शे ";
+            num %= 100;
+        }
+        if (num > 0) {
+            words += (num < 100 ? ones[num] : "");
+        }
+        
+        return words.trim() + " रुपये मात्र";
+    }
+
+    function generateReceipt() {
+        const receiptNo = document.getElementById('receiptNo').value;
+        const donorName = document.getElementById('donorName').value;
+        const mobile = document.getElementById('mobile').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+        const paymentMode = document.getElementById('paymentMode').value;
+        const collector = document.getElementById('collector').value || 'Self';
+        const date = new Date().toLocaleDateString();
+        
+        if (!donorName || isNaN(amount) || !mobile) { alert('Please fill Name, Mobile, and Amount!'); return; }
+        
+        const tx = { receiptNo, date, donorName, mobile, amount, paymentMode, collector };
+        transactions.push(tx);
+        localStorage.setItem('mandal_transactions', JSON.stringify(transactions));
+        localStorage.setItem('mandal_last_receipt', receiptSeq);
+        
+        document.getElementById('pReceiptNo').innerText = receiptNo;
+        document.getElementById('pDate').innerText = date;
+        document.getElementById('pName').innerText = donorName;
+        document.getElementById('pAmount').innerText = '₹' + amount;
+        document.getElementById('pMode').innerText = paymentMode;
+        document.getElementById('pCollector').innerText = collector;
+        document.getElementById('pAmountWords').innerText = numberToMarathiWords(amount);
+        
+        currentData = tx;
+        document.getElementById('receiptCard').style.display = 'block';
+        document.getElementById('actionButtons').style.display = 'block';
+        
+        receiptSeq++;
+        document.getElementById('receiptNo').value = "SGM-2026-" + String(receiptSeq).padStart(3, '0');
+        document.getElementById('donorName').value = ''; 
+        document.getElementById('amount').value = '';
+    }
+    
+    function downloadBannerImage() {
+        const bannerElement = document.getElementById('receiptCard');
+        html2canvas(bannerElement, { scale: 3, useCORS: true }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `${currentData.receiptNo}_shahupuri_receipt.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
+    function sendWhatsAppText() {
+        const amountInWordsText = numberToMarathiWords(currentData.amount);
+        const text = `🛕 *शाहूपुरी गणेश मंडळ* 🛕%0A*६०४ इ वार्ड, शाहूपुरी पहिली गल्ली, कोल्हापूर - ४१६००१*%0A*रजि. नं. : एफ १००२६*%0A----------------------------------%0A*✦ वर्गणी पावती (२०२६) ✦*%0A----------------------------------%0A*पावती क्र.:* ${currentData.receiptNo}%0A*दिनांक:* ${currentData.date}%0A*नाव:* ${currentData.donorName}%0A*रक्कम:* ₹${currentData.amount} (${amountInWordsText})%0A*पेमेंट प्रकार:* ${currentData.paymentMode}%0A*संकलनकर्ता:* ${currentData.collector}%0A----------------------------------%0Aआपल्या अमूल्य सहकार्याबद्दल धन्यवाद! 🌸%0A*गणपती बाप्पा मोरया! मोरिया रे बाप्पा मोरया!*`;
+        window.open(`https://wa.me/${currentData.mobile}?text=${text}`, '_blank');
+    }
+</script>
+</body>
+</html>
