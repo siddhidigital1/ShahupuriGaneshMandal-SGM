@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shahupuri Ganesh Mandal - Admin Dashboard</title>
+    <style>
+        :root { --primary: #10b981; --primary-dark: #059669; --bg: #f3f4f6; --card-bg: #ffffff; --text: #1f2937; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .main-wrapper { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+        .container { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2, h3 { text-align: center; color: var(--primary-dark); margin-top: 0; }
+        .stats-box { background: #e6f4ea; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 15px; font-size: 16px; color: #137333; font-weight: bold; }
+        .table-container { overflow-x: auto; max-height: 350px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+        th, td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f9fafb; position: sticky; top: 0; }
+        button { width: 100%; background-color: #3b82f6; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 12px; }
+        button:hover { background-color: #2563eb; }
+        
+        /* Password Screen Styling */
+        #authScreen { text-align: center; padding: 30px 10px; }
+        #authScreen input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; box-sizing: border-box; margin-bottom: 12px; text-align: center; }
+        #adminContent { display: none; }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <!-- Password Protection Box -->
+    <div class="container" id="authScreen">
+        <h2>🔒 Mandal Leader Login</h2>
+        <p style="font-size: 13px; color: #6b7280;">Enter the admin password to view reports</p>
+        <input type="password" id="adminPassword" placeholder="Enter password">
+        <button onclick="checkPassword()">Login</button>
+    </div>
+
+    <!-- Protected Admin Dashboard Content -->
+    <div class="container" id="adminContent">
+        <h2>🏛️ शाहूपुरी गणेश मंडळ</h2>
+        <h3>Leader Dashboard & Reports</h3>
+        <div class="stats-box">Total Collected: ₹<span id="totalCollection">0</span></div>
+        <h3>📋 Collection History Log</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Receipt</th>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th>Collector</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr><td colspan="5" style="text-align:center; color:#888;">No entries yet</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <button onclick="exportToCSV()">📥 Download Excel / CSV File</button>
+        <button style="background-color: #dc2626; margin-top: 10px;" onclick="clearAllData()">🗑️ Clear All Test Data</button>
+        <button style="background-color: #6b7280; margin-top: 10px;" onclick="lockAdmin()">🔒 Lock / Logout</button>
+    </div>
+</div>
+
+<script>
+    // 👉 Password is set to admin123 (You can change it here anytime)
+    const CORRECT_PASSWORD = "admin123";
+
+    function checkPassword() {
+        const pass = document.getElementById('adminPassword').value;
+        if (pass === CORRECT_PASSWORD) {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            loadAdminData();
+        } else {
+            alert('Incorrect password! Please try again.');
+            document.getElementById('adminPassword').value = '';
+        }
+    }
+
+    function lockAdmin() {
+        document.getElementById('adminContent').style.display = 'none';
+        document.getElementById('authScreen').style.display = 'block';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function loadAdminData() {
+        let transactions = JSON.parse(localStorage.getItem('mandal_transactions')) || [];
+        let totalCollected = transactions.reduce((sum, item) => sum + item.amount, 0);
+
+        document.getElementById('totalCollection').innerText = totalCollected;
+        
+        const tbody = document.getElementById('historyTableBody');
+        if (transactions.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#888;">No entries yet</td></tr>`;
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        [...transactions].reverse().forEach(tx => {
+            const row = `<tr>
+                <td>${tx.receiptNo}</td>
+                <td>${tx.donorName}</td>
+                <td>₹${tx.amount}</td>
+                <td>${tx.paymentMode}</td>
+                <td>${tx.collector}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function exportToCSV() {
+        let transactions = JSON.parse(localStorage.getItem('mandal_transactions')) || [];
+        if (transactions.length === 0) {
+            alert('No data available to export yet!');
+            return;
+        }
+        
+        let csvContent = "data:text/csv;charset=utf-8,Receipt No,Date,Donor Name,Mobile,Amount,Payment Mode,Collector\n";
+        transactions.forEach(tx => {
+            csvContent += `"${tx.receiptNo}","${tx.date}","${tx.donorName}","${tx.mobile}","${tx.amount}","${tx.paymentMode}","${tx.collector}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "shahupuri_mandal_report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function clearAllData() {
+        if (confirm('Are you sure you want to delete all transaction records and reset receipt numbers?')) {
+            localStorage.removeItem('mandal_transactions');
+            localStorage.removeItem('mandal_last_receipt');
+            alert('All data cleared successfully!');
+            location.reload();
+        }
+    }
+</script>
+</body>
+</html>
